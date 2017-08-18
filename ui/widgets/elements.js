@@ -62,7 +62,7 @@
 		var optionsSize = $options.length;
 
 		// Fix the issue that mouse events still happen on IE.
-		if($this.prop('disabled') === true) {
+		if($this.prop('disabled') === true || $.type($this.attr('readonly')) != 'undefined') {
 			event.preventDefault();
 
 			return false;

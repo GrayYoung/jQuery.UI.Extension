@@ -434,11 +434,22 @@ QUnit.test( "zIndex, applied to all handles", function( assert ) {
 } );
 
 QUnit.test( "setOption handles", function( assert ) {
-	assert.expect( 11 );
+	assert.expect( 19 );
 
-	var target = $( "<div></div>" ).resizable();
+	// https://bugs.jqueryui.com/ticket/3423
+	// https://bugs.jqueryui.com/ticket/15084
+	var target = $( "<div></div>" ).resizable(),
+		target2 = $( "<div>" +
+					"<div class='ui-resizable-handle ui-resizable-e'></div>" +
+					"<div class='ui-resizable-handle ui-resizable-w'></div>" +
+					"</div>" ).resizable( {
+						handles: {
+							"e": "ui-resizable-e",
+							"w": "ui-resizable-w"
+						}
+					} );
 
-	function checkHandles( expectedHandles ) {
+	function checkHandles( target, expectedHandles ) {
 		expectedHandles = $.map( expectedHandles, function( value ) {
 			return ".ui-resizable-" + value;
 		} );
@@ -451,13 +462,22 @@ QUnit.test( "setOption handles", function( assert ) {
 		} );
 	}
 
-	checkHandles( [ "e", "s", "se" ] );
+	checkHandles( target, [ "e", "s", "se" ] );
 
 	target.resizable( "option", "handles", "n, w, nw" );
-	checkHandles( [ "n", "w", "nw" ] );
+	checkHandles( target, [ "n", "w", "nw" ] );
 
 	target.resizable( "option", "handles", "s, w" );
-	checkHandles( [ "s", "w" ] );
+	checkHandles( target, [ "s", "w" ] );
+
+	target2.resizable( "option", "handles", "e, s, w" );
+	checkHandles( target2, [ "e", "s", "w" ] );
+
+	target.resizable( "destroy" );
+	checkHandles( target, [ ] );
+
+	target2.resizable( "destroy" );
+	checkHandles( target2, [ "e", "w" ] );
 } );
 
 QUnit.test( "alsoResize + containment", function( assert ) {
